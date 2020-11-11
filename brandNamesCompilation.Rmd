@@ -1,0 +1,57 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+brandNames <- tibble(Name = "21st Century, Advanced Bionutritionals, Align, Allergy Research Group, Amazing Grass, American Health, AOR (Advanced Orthomolecular Research)*, Barlean's, Bausch & Lomb, Bayer, Berkley Jensen (BJ's Wholesale Club), Best Naturals, Biotics Research, BioTrust, Bluebird Botanicals, Bluebonnet, Bronson Labs*, Bulk Supplements, Caltrate, Carlson, Centrum, Charlotte's Web, Citracal, CocoVia, Cosamin*, Country Life, Culturelle, CVS, Designs for Health, Doctor's Best, Doterra, Douglas Laboratories, Dr. Fuhrman*, Dr. Mercola, Dr. Sinatra, Dr. David Williams, Elysium*, Enzymatic Therapy, Enzymedica, Equate (Walmart), Ester-C, Flora*, Gaia Herbs, Garden of Life, GNC, Gundry MD, Healthy Origins, Herb Pharm, Himalaya Herbal Healthcare USA, Host Defense, HPF Cholestene, Integrative Therapeutics, Jamieson (Canada), Jarrow, Jigsaw Health*, Juice Plus*, Julian Whitaker, KAL, Kirkland (Costco), Klaire Labs, Kroger, Kyolic/Kyo-Dophilus (Wakunaga), Life Extension, MegaFoods, MegaRed, Member's Mark (Sam's Club), Metagenics, Move Free, MRM (Metabolic Response Modifers)*, Natrol, Natural Factors (Canada), Natural Factors (U.S.), Natural Vitality*, Nature Made, Nature's Answer*, Nature's Bounty, Nature's Life, Nature's Plus, Nature's Sunshine*, Nature's Valley (Savon)*, Nature's Way, Neocell, New Chapter, Nordic Naturals, NOW, Nutrex, Nutricology, Nutrigold, One-A-Day, Optimum Nutrition, Oregon's Wild Harvest, Organic India, Ortho Molecular, Osteo Bi-Flex, Piping Rock, Planetary Herbals, PlusCBD Oil, ProCaps (Andrew Lessman), Pure Encapsulations, Puritan's Pride, Purity Products*, Qunol, Rainbow Light, Renew Life, Rite Aid, Schiff, Seeking Health*, Shaklee*, Solaray, Solgar, Source Naturals, Spectrum, Spring Valley (Walmart), Sprouts, Standard Process, Stop Aging Now (SAN), Sundown, Swanson, Terry Naturally (Euro Pharma), Thorne Research, Trader Darwin (Trader Joe's), TruNature (Costco), Twinlab, Up & Up (Target), USANA, Vega, Vitacost, Vitafusion, Vital Choice*, Vital Nutrients*, Vital Proteins,Vitamin Shoppe, Vitamin World, Viva Labs, Walgreens (Finest Naturals), Webber Naturals (Canada), Weil (Andrew Weil), Whole Foods, Xymogen, Young Living, and Youtheory.")
+```
+
+```{r}
+brandNamesDf <- data.frame()
+brandNames %<>% separate_rows(Name, sep = ",", convert = T)
+brandNames %<>% mutate(Name = str_replace(Name, pattern = "\\*", ""))
+brandNames %>% write_rds("BrandNames.RDS")
+brandNames <- read_rds("BrandNames.RDS")
+brandNames %<>% mutate(Name = str_remove_all(Name, pattern = "\\(.*\\)"))
+brandNames %<>% mutate(Name = str_remove_all(Name, pattern = "\\(.*$"))
+```
+
+```{r}
+  dsProduct$brandName <- NA
+  for (i in 1:nrow(dsProduct)) {
+    for (j in 1:nrow(brandNames)) {
+      if (grepl(pattern = brandNames$Name[j] %>% trimws(), dsProduct$DSDSUPP[i], ignore.case = T)) {
+        dsProduct$brandName[i] <- brandNames$Name[j]
+        next
+      }
+      
+    }
+  }
+
+dsProduct %<>% mutate(brandName = unnest(brandName))
+  
+# brandFinder <- function(supplName, brandName) {
+#   if_else(grepl(pattern = brandName %>% trimws(), supplName, ignore.case = T),
+#           return(brandName %>% trimws()),
+#           return(NA))
+# }
+# 
+# library(parallel)
+# 
+# cl <- makeCluster(14)  
+# clusterExport(cl = cl, "%>%")
+# 
+# test <- clusterMap(cl = cl, fun = brandFinder, dsProduct$DSDSUPP,
+#                    brandNames$Name, RECYCLE = T, SIMPLIFY = T)
+
+```
+
+```{r}
+test2 <- sapply(dsProduct$DSDSUPP[1:15], brandFinder, brandNames$Name)
+```
+
+
+
+
+

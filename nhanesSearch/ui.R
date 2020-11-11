@@ -7,18 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 source("libraries.R")
+source("functions.R")
 
-## A list of year pairs for fetching data from NHANES
-yearChoices <- vector(6, mode = "character")
-yearSeq <- seq(2007, 2018)
-i = 0
-for (y in 1:length(yearChoices)) {
-    yearChoices[y] <- paste(yearSeq[y + i], "-", yearSeq[y + i + 1], sep = "")
-    i = i + 1
-}
-
-yearChoiceDf <- data.frame(yearChoices, LETTERS = LETTERS[5:(4 + length(yearChoices))])
-### End of Logic
 
 sidebar <- 
     dashboardSidebar(
@@ -55,27 +45,62 @@ body <-
             ),
             tabItem(
                 tabName = "searchSupplement",
-                box(
-                    title = "Filter Supplements",
-                    footer = "You can filter Supplement Names as well as the year",
-                    searchInput(
-                        inputId = "searchTerm",
-                        label = "Search in supplement name",
-                        value = "",
-                        placeholder = "Eg: Cranberry"
+                fluidPage(
+                    fluidRow(
+                        column(
+                            width = 3,
+                            box(
+                                width = NULL,
+                                title = "Filter Supplements",
+                                footer = "You can filter Supplement Names as well as the year",
+                                searchInput(
+                                    inputId = "searchTerm",
+                                    label = "Search in supplement name",
+                                    value = "",
+                                    placeholder = "Eg: Cranberry"
+                                )
+                            )
+                        ),
+                        column(
+                            width = 6,
+                            box(
+                                width = NULL,
+                                title = "Select survey cycles",
+                                footer = "weights are combined if multiple survey cycles are selected",
+                                sliderTextInput(
+                                    inputId = "year",
+                                    label = "Year",
+                                    choices = yearChoiceDf[["yearChoices"]],
+                                    selected = c("2013-2014", "2015-2016"),
+                                    dragRange = T,
+                                    grid = T,
+                                    force_edges = T
+                                )
+                                #verbatimTextOutput(outputId = "printYear")
+                            )
+                        ),
+                        column(
+                            width = 3,
+                            
+                            fluidRow(
+                                valueBoxOutput(outputId = "uniqSuppl",
+                                                   width = NULL),
+                                valueBoxOutput(outputId = "uniqBrand",
+                                                   width = NULL)
+                            ),
+                            fluidRow(
+                                valueBoxOutput(outputId = "first24Sum",
+                                               width = NULL)
+                            ),
+                            fluidRow(
+                                valueBoxOutput(outputId = "second24Sum",
+                                               width = NULL)
+                            )
+                            
+                        )
                     ),
-                    sliderTextInput(
-                        inputId = "year",
-                        label = "Year",
-                        choices = yearChoiceDf[["yearChoices"]],
-                        selected = c("2015-2016", "2017-2018"),
-                        dragRange = T,
-                        grid = T,
-                        force_edges = T
-                    ),
-                    verbatimTextOutput(outputId = "printYear")
-                ),
-                DTOutput(outputId = "searchedSupplement")
+                    DTOutput(outputId = "searchedSupplement")
+                )
             )
         )
     )
