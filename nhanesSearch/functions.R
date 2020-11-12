@@ -23,13 +23,16 @@ yearChoiceDf <- data.frame(serial = 1:length(yearChoices),
 
 
 
-func_filterSupplementName <- function(searchTerm, year, alphabet) {
+func_filterSupplementName <- function(searchTerm, year, alphabet,
+                                      searchType = TRUE, removeTerm = NA) {
   
   ## Preprocess the search term - replace comma by pipe for searching 'OR' terms.
-  searchTerm <- str_replace(searchTerm, pattern = ",\\s{0,}", replacement = "|") %>%
-    #str_remove_all(pattern = " ") %>%
-    trimws() %>%
-    toupper()
+  # searchTerm <- str_replace(searchTerm, pattern = "\\s{1,}", replacement = "") %>%
+  #   #str_remove_all(pattern = " ") %>%
+  #   trimws() %>%
+  #   toupper()
+  
+  
   
   yearChoiceSubset <<- yearChoiceDf %>% 
     slice(
@@ -47,14 +50,53 @@ func_filterSupplementName <- function(searchTerm, year, alphabet) {
                                    alphabet = yearChoiceSubset$LETTERS[i])
                                  )
   }
+  #browser()
+  if (!searchType) {
+    searchTerm <- 
+      str_replace_all(searchTerm, pattern = "\\s{0,}", replacement = "") %>%
+      str_split(pattern = ",", simplify = T) %>%
+      toupper() 
+    
+    
+    dsInterviewFile <-
+      dsInterviewFile %>%
+      filter(
+        lapply(
+          searchTerm, FUN = grepl, dsInterviewFile$DSDSUPP
+        ) %>%
+          data.frame() %>%
+          apply(MARGIN = 1, FUN = prod) %>%
+          as.logical() %>%
+          as.vector()
+      )
+
+  } else {
+    searchTerm <- str_replace(searchTerm, pattern = ",\\s{0,}", replacement = "|") %>%
+        trimws() %>%
+        toupper()
+    
+    
+    dsInterviewFile %<>% 
+      filter(str_detect(DSDSUPP, pattern = regex(searchTerm, ignore_case = T)))
+  }
   
+  ## remove supplements which have their names matching the 'removeTerm' string
+  if (removeTerm != "") {
+    removeTerm <- str_replace(removeTerm, pattern = ",\\s{0,}", replacement = "|") %>%
+      trimws() %>%
+      toupper()
+    
+    dsInterviewFile %<>% 
+      filter(!grepl(pattern = removeTerm, DSDSUPP))
+  }
   
 
+
   outputDf <- dsProductFile %>%
-    filter(str_detect(DSDSUPP, pattern = regex(searchTerm, ignore_case = T))) %>%
-    inner_join(dsInterviewFile, by = c("DSDSUPID")) %>%
-    select(DSDSUPID, DSDSUPP.x, brandName, WTDRD1, WTDR2D) %>%
-    group_by(DSDSUPID, DSDSUPP.x, brandName) %>%
+    #filter(str_detect(DSDSUPP, pattern = regex(searchTermAnd, ignore_case = T))) %>%
+    inner_join(dsInterviewFile, by = c("DSDPID")) %>%
+    select(DSDPID, DSDSUPP.x, brandName, WTDRD1, WTDR2D) %>%
+    group_by(DSDPID, DSDSUPP.x, brandName) %>%
     summarise(across(where(is.numeric),
                      .fns = list(sum = ~sum(.x, na.rm = T)/nrow(yearChoiceSubset)),
                      .groups = "keep"

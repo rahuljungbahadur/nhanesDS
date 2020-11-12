@@ -12,18 +12,10 @@ source("functions.R")
 
 sidebar <- 
     dashboardSidebar(
-        sidebarSearchForm(label = "Enter a number", "searchText", "searchButton"),
         sidebarMenu(
             # Setting id makes input$tabs give the tabName of currently-selected tab
             id = "tabs",
-            menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-            menuItem("Search Supplement", tabName = "searchSupplement", icon = icon("search")),
-            menuItem("Widgets", icon = icon("th"), tabName = "widgets", badgeLabel = "new",
-                     badgeColor = "green"),
-            menuItem("Charts", icon = icon("bar-chart-o"),
-                     menuSubItem("Sub-item 1", tabName = "subitem1"),
-                     menuSubItem("Sub-item 2", tabName = "subitem2")
-            )
+            menuItem("Search Supplement", tabName = "searchSupplement", icon = icon("search"))
         )
     )
 
@@ -52,12 +44,31 @@ body <-
                             box(
                                 width = NULL,
                                 title = "Filter Supplements",
-                                footer = "You can filter Supplement Names as well as the year",
+                                switchInput(inputId = "searchType",
+                                            label = "Type of search",
+                                            onLabel = "OR",
+                                            offLabel = "AND",
+                                            offStatus = "info",
+                                            inline = T,
+                                            value = F,
+                                            size = "small",
+                                            #labelWidth = "500px",
+                                            width = "100%"
+                                ),
+                                bsTooltip("searchType", "The wait times will be broken into this many equally spaced bins",
+                                          "right", options = list(container = "body")),
+                                HTML("<hr>"),
                                 searchInput(
                                     inputId = "searchTerm",
-                                    label = "Search in supplement name",
+                                    label = "Terms to include in supplement name",
                                     value = "",
-                                    placeholder = "Eg: Cranberry"
+                                    placeholder = "Eg: calcium,antacid"
+                                ),
+                                searchInput(
+                                    inputId = "removeTerm",
+                                    label = "Terms to remove",
+                                    value = NA,
+                                    placeholder = "Eg: Antacid,Gummy"
                                 )
                             )
                         ),
@@ -66,7 +77,9 @@ body <-
                             box(
                                 width = NULL,
                                 title = "Select survey cycles",
-                                footer = "weights are combined if multiple survey cycles are selected",
+                                footer = tags$p("Selecting multiple survey cycles combines the weights according to NHANES procedure",
+                                                tags$a(href = "https://wwwn.cdc.gov/nchs/nhanes/tutorials/module3.aspx", "Click here for NHANES document!"),
+                                                style = "font-size: 60%;"),
                                 sliderTextInput(
                                     inputId = "year",
                                     label = "Year",
@@ -75,18 +88,32 @@ body <-
                                     dragRange = T,
                                     grid = T,
                                     force_edges = T
+                                ),
+                                column(
+                                    width = 6,
+                                    flexdashboard::gaugeOutput(outputId = "pctFirst24Wt",
+                                                               height = "120px")
+                                ), column(
+                                    width = 6,
+                                    flexdashboard::gaugeOutput(outputId = "pctSecond24Wt",
+                                                               height = "120px")
                                 )
-                                #verbatimTextOutput(outputId = "printYear")
                             )
                         ),
                         column(
                             width = 3,
                             
                             fluidRow(
-                                valueBoxOutput(outputId = "uniqSuppl",
-                                                   width = NULL),
-                                valueBoxOutput(outputId = "uniqBrand",
+                                column(
+                                    width = 6,
+                                    valueBoxOutput(outputId = "uniqSuppl",
                                                    width = NULL)
+                                ),
+                                column(
+                                    width = 6,
+                                    valueBoxOutput(outputId = "uniqBrand",
+                                                   width = NULL)
+                                )
                             ),
                             fluidRow(
                                 valueBoxOutput(outputId = "first24Sum",
@@ -99,13 +126,26 @@ body <-
                             
                         )
                     ),
-                    DTOutput(outputId = "searchedSupplement")
+                    DTOutput(outputId = "searchedSupplement"),
+                    downloadBttn(outputId = "downloadSupplement",
+                                   label = "Download supplement info",
+                                 size = "sm",
+                                 style = "jelly"),
+                    downloadBttn(outputId = "downloadIngredient",
+                                 label = "Download Ingredient info",
+                                 size = "sm",
+                                 style = "jelly")
                 )
             )
         )
     )
 
+header <- dashboardHeader(
+    title = "NHANES dietary supplement",
+    titleWidth = "300px"
+)
+
 dashboardPage(
-    header = dashboardHeader(),
+    header = header,
     sidebar = sidebar,
     body = body)

@@ -50,6 +50,18 @@ dsProduct %<>% mutate(brandName = unnest(brandName))
 ```{r}
 test2 <- sapply(dsProduct$DSDSUPP[1:15], brandFinder, brandNames$Name)
 ```
+```{r}
+
+dsInterview <- fread("dataFiles/dsInterview2017-2018.csv")
+
+dsInterview %<>%
+  mutate(DSDSUPID = as.character(DSDSUPID)) %>%
+  left_join(dsProduct %>% select(DSDPID, DSDSUPID), by = "DSDSUPID")
+
+dsInterview %>% colnames()
+
+write.csv(dsinterview17_18, "dataFiles/dsInterview2017-2018.csv", row.names = F)
+```
 
 
 
