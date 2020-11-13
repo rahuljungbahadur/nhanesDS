@@ -33,7 +33,6 @@ func_filterSupplementName <- function(searchTerm, year, alphabet,
   #   toupper()
   
   
-  
   yearChoiceSubset <<- yearChoiceDf %>% 
     slice(
       which(
@@ -41,6 +40,23 @@ func_filterSupplementName <- function(searchTerm, year, alphabet,
                                                         )
       )
   
+  ## 30 Days interview data
+  ds30DayInterview <- data.table()
+  
+
+  for (i in 1:nrow(yearChoiceSubset)) {
+    ds30DayInterview <- bind_rows(ds30DayInterview,
+                                  func_read30DayInterview(
+                                    year = yearChoiceSubset$yearChoices[i],
+                                    alphabet = yearChoiceSubset$LETTERS[i]) %>% 
+                                    select(SEQN, WTINT2YR, DSDPID)
+    )
+  }
+  
+  # ds30DayInterview %<>%
+  #   left_join(dsProductFile %>% select(DSDPID), by = "DSDPID")
+  
+  ds30DayInterview %<>% setkey(DSDPID)
   #browser()
   dsInterviewFile <- data.table()
   for (i in 1:nrow(yearChoiceSubset)) {
@@ -49,8 +65,26 @@ func_filterSupplementName <- function(searchTerm, year, alphabet,
                                    year = yearChoiceSubset$yearChoices[i],
                                    alphabet = yearChoiceSubset$LETTERS[i])
                                  )
+    
+    
   }
+  
+  dsInterviewFile %<>% setkey(DSDPID)
+  
   #browser()
+  
+  
+  dsInterviewFile %<>% 
+    full_join(ds30DayInterview, by = c("SEQN", "DSDPID"))
+  
+  dsInterviewFile %<>% 
+    inner_join(dsProductFile %>% select(DSDPID, DSDSUPP), by = "DSDPID")
+  
+  dsInterviewFile %<>% 
+    filter(DSDSUPP != "NO PRODUCT INFORMATION AVAILABLE")
+  
+  #browser()
+  
   if (!searchType) {
     searchTerm <- 
       str_replace_all(searchTerm, pattern = "\\s{0,}", replacement = "") %>%
@@ -92,17 +126,16 @@ func_filterSupplementName <- function(searchTerm, year, alphabet,
   
 
 
-  outputDf <- dsProductFile %>%
+  outputDf <- dsProductFile %>% select(-DSDSUPP) %>%
     #filter(str_detect(DSDSUPP, pattern = regex(searchTermAnd, ignore_case = T))) %>%
     inner_join(dsInterviewFile, by = c("DSDPID")) %>%
-    select(DSDPID, DSDSUPP.x, brandName, WTDRD1, WTDR2D) %>%
-    group_by(DSDPID, DSDSUPP.x, brandName) %>%
+    select(DSDPID, DSDSUPP, brandName, WTINT2YR, WTDRD1, WTDR2D) %>%
+    group_by(DSDPID, DSDSUPP, brandName) %>%
     summarise(across(where(is.numeric),
                      .fns = list(sum = ~sum(.x, na.rm = T)/nrow(yearChoiceSubset)),
                      .groups = "keep"
                      )) %>%
-    arrange(desc(WTDRD1_sum), desc(WTDR2D_sum)) %>%
-    rename(DSDSUPP = DSDSUPP.x)
+    arrange(desc(WTINT2YR_sum), desc(WTDRD1_sum), desc(WTDR2D_sum))
 
   return(outputDf)
 }

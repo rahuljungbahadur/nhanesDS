@@ -90,6 +90,11 @@ body <-
                                     force_edges = T
                                 ),
                                 column(
+                                    width = 12,
+                                    flexdashboard::gaugeOutput(outputId = "pct30DaysWt",
+                                                              height = "120px")
+                                ),
+                                column(
                                     width = 6,
                                     flexdashboard::gaugeOutput(outputId = "pctFirst24Wt",
                                                                height = "120px")
@@ -114,6 +119,10 @@ body <-
                                     valueBoxOutput(outputId = "uniqBrand",
                                                    width = NULL)
                                 )
+                            ),
+                            fluidRow(
+                                valueBoxOutput(outputId = "days30Sum",
+                                               width = NULL)
                             ),
                             fluidRow(
                                 valueBoxOutput(outputId = "first24Sum",

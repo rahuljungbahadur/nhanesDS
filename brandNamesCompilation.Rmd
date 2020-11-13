@@ -54,14 +54,96 @@ test2 <- sapply(dsProduct$DSDSUPP[1:15], brandFinder, brandNames$Name)
 
 dsInterview <- fread("dataFiles/dsInterview2017-2018.csv")
 
-dsInterview %<>%
+ds30DayInterview7_8 %<>%
   mutate(DSDSUPID = as.character(DSDSUPID)) %>%
   left_join(dsProduct %>% select(DSDPID, DSDSUPID), by = "DSDSUPID")
 
-dsInterview %>% colnames()
+ds30DayInterview7_8 %>% colnames()
 
-write.csv(dsinterview17_18, "dataFiles/dsInterview2017-2018.csv", row.names = F)
+write.csv(ds30DayInterview7_8, "dataFiles/ds30DayInterview7_8.csv", row.names = F)
 ```
+```{r}
+ds30DayInterview7_8 %>% head()
+```
+## Getting Demo File
+```{r}
+demoFile <- read_xpt(
+       file = paste0("https://wwwn.cdc.gov/Nchs/Nhanes/",
+                     "2017-2018",
+                     "/DEMO_",
+                     "J", 
+                     ".XPT")
+     )
+
+write.csv(demoFile, "dataFiles/demoFile2017-2018.csv", row.names = F)
+```
+
+```{r}
+day30Interview <- read_xpt(
+       file = paste0("https://wwwn.cdc.gov/Nchs/Nhanes/",
+                     "2017-2018",
+                     "/DSQIDS_",
+                     "J", 
+                     ".XPT")
+     )
+
+write.csv(day30Interview, "dataFiles/day30Interview2017-2018.csv", row.names = F)
+```
+
+Changing all DSDSUPID in 30 day interview files to DSDPID by joining it with dsProductFile
+```{r}
+day30Interview <- fread("dataFiles/day30Interview2013-2014.csv") %>%
+  left_join(dsProductFile %>% select(DSDPID, DSDSUPID), by = "DSDSUPID")
+
+#day30Interview %>% select(DSDSUPID, DSDPID)
+write.csv(day30Interview, "dataFiles/day30Interview2013-2014.csv", row.names = F)
+```
+
+
+
+```{r}
+Days30Weight <- ds30DayInterview7_8 %>%
+  left_join(demo7_8 %>% select(SEQN, WTINT2YR)) %>%
+  select(DSDPID, WTINT2YR) %>%
+  left_join(dsProductFile %>% select(DSDSUPP, DSDPID), by = "DSDPID") %>%
+  group_by(DSDPID, DSDSUPP) %>%
+  summarise(wtSum = sum(WTINT2YR, na.rm = T)) %>%
+  arrange(desc(wtSum))
+
+cranberry30Day <- Days30Weight %>% 
+  filter(str_detect(DSDSUPP, pattern = "CALCIUM"))
+
+sum(cranberry30Day$wtSum)
+```
+
+```{r}
+library(microbenchmark)
+
+func_fread <- function() {
+  fread("dataFiles/dsIngredientInfo.csv")
+}
+
+dsIngredientFile %>% write_rds("dataFiles/dsIngredientInfo.rds")
+
+func_readRds <- function() {
+  readRDS("dataFiles/dsIngredientInfo.rds")
+}
+```
+
+```{r}
+readResults <- microbenchmark(fread("dataFiles/dsIngredientInfo.rds"),
+                              readRDS("dataFiles/dsIngredientInfo.rds")
+                              )
+```
+
+
+
+
+
+
+
+
+
 
 
 

@@ -46,10 +46,24 @@ shinyServer(function(input, output) {
         )
     )
     
+    output$days30Sum <- renderValueBox(
+        valueBox(
+            subtitle = tags$p("Total 30 days interview weights",style = "font-size: 80%;"),
+            value = tags$p(format(round(sum(supplementDf$data$WTINT2YR_sum, na.rm = T)),
+                                  big.mark = ","),
+                           style = "font-size: 60%;"),
+            width = 4,
+            icon = icon("user")
+            
+        )
+    )
+    
     output$first24Sum <- renderValueBox(
         valueBox(
             subtitle = tags$p("Total first 24 Hr weights",style = "font-size: 80%;"),
-            value = tags$p(format(round(sum(supplementDf$data$WTDRD1_sum, na.rm = T)), big.mark = ","), style = "font-size: 60%;"),
+            value = tags$p(format(round(sum(supplementDf$data$WTDRD1_sum, na.rm = T)),
+                                  big.mark = ","),
+                           style = "font-size: 60%;"),
             width = 4,
             icon = icon("user")
             
@@ -59,7 +73,9 @@ shinyServer(function(input, output) {
     output$second24Sum <- renderValueBox(
         valueBox(
             subtitle = tags$p("Total second 24 Hr weights", style = "font-size: 80%;"),
-            value = tags$p(format(round(sum(supplementDf$data$WTDR2D_sum, na.rm = T)), big.mark = ","),style = "font-size: 60%;"),
+            value = tags$p(format(round(sum(supplementDf$data$WTDR2D_sum, na.rm = T)),
+                                  big.mark = ","),
+                           style = "font-size: 60%;"),
             width = 4,
             icon = icon("user")
         )
@@ -68,7 +84,12 @@ shinyServer(function(input, output) {
     output$uniqBrand <- renderValueBox(
         valueBox(
             subtitle = tags$p("Total unique brands", style = "font-size: 80%;"),
-            value = tags$p(supplementDf$data %>% ungroup() %>% select(brandName) %>% distinct() %>% count(), style = "font-size: 60%;"),
+            value = tags$p(supplementDf$data %>%
+                               ungroup() %>%
+                               select(brandName) %>%
+                               distinct() %>%
+                               count(),
+                           style = "font-size: 60%;"),
             width = NULL
         )
     )
@@ -79,10 +100,13 @@ shinyServer(function(input, output) {
                  colnames = c("SupplementID",
                               "SupplementName",
                               "BrandName",
+                              "30DayWeights",
                               "First24HrWeights",
                               "Sec24HrWeights")) %>%
-        formatRound(columns = c(4,5),
-                    digits = 0)
+        formatRound(columns = c(4,5,6),
+                    digits = 0,
+                    interval = 3,
+                    mark = ",")
         )
     
     ## Download button
@@ -106,6 +130,19 @@ shinyServer(function(input, output) {
             max = 100,
             symbol = "%",
             label = "First 24 Hr\n cummulative weight %"
+        )
+    }
+    )
+    
+    output$pct30DaysWt <- flexdashboard::renderGauge({
+        index = input$searchedSupplement_rows_selected 
+        flexdashboard::gauge(value = round(
+            sum(supplementDf$data$WTINT2YR_sum[index], na.rm = T) * 100 /
+                sum(supplementDf$data$WTINT2YR_sum, na.rm = T), 2),
+            min = 0,
+            max = 100,
+            symbol = "%",
+            label = "30 Days interview\n cummulative weight %"
         )
     }
     )
