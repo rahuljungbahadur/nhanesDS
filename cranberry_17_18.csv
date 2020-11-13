@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <script type="application/shiny-singletons">319444da740392f204483c5df0f124fd8c56ee5f</script>
+  <script type="application/html-dependencies">json2[2014.02.04];jquery[3.5.1];shiny[1.5.0];font-awesome[5.13.0];ionrangeslider[2.1.6];strftime[0.9.2];shinyWidgets[0.5.4];bootstrap-switch[3.3.4];htmlwidgets[1.5.1];datatables-css[0.0.0];datatables-binding[0.15];crosstalk[1.1.0.1];bootstrap[3.4.1];AdminLTE[2.0.6];shinydashboard[0.7.1]</script>
+<script src="shared/json2-min.js"></script>
+<script src="shared/jquery.min.js"></script>
+<link href="shared/shiny.css" rel="stylesheet" />
+<script src="shared/shiny.min.js"></script>
+<link href="font-awesome-5.13.0/css/all.min.css" rel="stylesheet" />
+<link href="font-awesome-5.13.0/css/v4-shims.min.css" rel="stylesheet" />
+<link href="shared/ionrangeslider/css/ion.rangeSlider.css" rel="stylesheet" />
+<link href="shared/ionrangeslider/css/ion.rangeSlider.skinShiny.css" rel="stylesheet" />
+<script src="shared/ionrangeslider/js/ion.rangeSlider.min.js"></script>
+<script src="shared/strftime/strftime-min.js"></script>
+<link href="shinyWidgets/shinyWidgets.min.css" rel="stylesheet" />
+<script src="shinyWidgets/shinyWidgets-bindings.min.js"></script>
+<link href="shinyWidgets/bootstrap-switch/bootstrap-switch-3.3.4/bootstrap-switch.min.css" rel="stylesheet" />
+<script src="shinyWidgets/bootstrap-switch/bootstrap-switch-3.3.4/bootstrap-switch.min.js"></script>
+<script src="htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<link href="datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="datatables-binding-0.15/datatables.js"></script>
+<link href="crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="shared/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="shared/bootstrap/js/bootstrap.min.js"></script>
+<script src="shared/bootstrap/shim/html5shiv.min.js"></script>
+<script src="shared/bootstrap/shim/respond.min.js"></script>
+<link href="AdminLTE-2.0.6/AdminLTE.min.css" rel="stylesheet" />
+<link href="AdminLTE-2.0.6/_all-skins.min.css" rel="stylesheet" />
+<script src="AdminLTE-2.0.6/app.min.js"></script>
+<link href="shinydashboard-0.7.1/shinydashboard.css" rel="stylesheet" />
+<script src="shinydashboard-0.7.1/shinydashboard.min.js"></script>  <style>.btn-addon{font-size:14.5px;margin:0 0 0 0 !important;display: inline-block !important;}</style>
+</head>
+<body class="skin-blue" style="min-height: 611px;">
+  <div class="wrapper">
+    <header class="main-header">
+      <span class="logo"></span>
+      <nav class="navbar navbar-static-top" role="navigation">
+        <span style="display:none;">
+          <i class="fa fa-bars"></i>
+        </span>
+        <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+          <span class="sr-only">Toggle navigation</span>
+        </a>
+        <div class="navbar-custom-menu">
+          <ul class="nav navbar-nav"></ul>
+        </div>
+      </nav>
+    </header>
+    <aside id="sidebarCollapsed" class="main-sidebar" data-collapsed="false">
+      <section id="sidebarItemExpanded" class="sidebar">
+        <form class="sidebar-form">
+          <div class="input-group">
+            <input id="searchText" type="text" class="form-control" placeholder="Enter a number" style="margin: 5px;"/>
+            <span class="input-group-btn">
+              <button id="searchButton" type="button" class="btn btn-flat action-button">
+                <i class="fa fa-search"></i>
+              </button>
+            </span>
+          </div>
+        </form>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#shiny-tab-dashboard" data-toggle="tab" data-value="dashboard">
+              <i class="fa fa-dashboard"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#shiny-tab-searchSupplement" data-toggle="tab" data-value="searchSupplement">
+              <i class="fa fa-search"></i>
+              <span>Search Supplement</span>
+            </a>
+          </li>
+          <li>
+            <a href="#shiny-tab-widgets" data-toggle="tab" data-value="widgets">
+              <i class="fa fa-th"></i>
+              <span>Widgets</span>
+              <small class="badge pull-right bg-green">new</small>
+            </a>
+          </li>
+          <li class="treeview">
+            <a href="#">
+              <i class="fa fa-bar-chart-o"></i>
+              <span>Charts</span>
+              <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu" style="display: none;" data-expanded="Charts">
+              <li>
+                <a href="#shiny-tab-subitem1" data-toggle="tab" data-value="subitem1">
+                  <i class="fa fa-angle-double-right"></i>
+                  Sub-item 1
+                </a>
+              </li>
+              <li>
+                <a href="#shiny-tab-subitem2" data-toggle="tab" data-value="subitem2">
+                  <i class="fa fa-angle-double-right"></i>
+                  Sub-item 2
+                </a>
+              </li>
+            </ul>
+          </li>
+          <div id="tabs" class="sidebarMenuSelectedTabItem" data-value="null"></div>
+        </ul>
+      </section>
+    </aside>
+    <div class="content-wrapper">
+      <section class="content">
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane" id="shiny-tab-dashboard">
+            <div class="form-group shiny-input-container">
+              <label class="control-label" for="bins">Number of bins:</label>
+              <input class="js-range-slider" id="bins" data-min="1" data-max="50" data-from="30" data-step="1" data-grid="true" data-grid-num="9.8" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-data-type="number"/>
+            </div>
+            <div class="col-sm-8">
+              <div id="distPlot" class="shiny-plot-output" style="width: 100% ; height: 400px"></div>
+            </div>
+          </div>
+          <div role="tabpanel" class="tab-pane" id="shiny-tab-searchSupplement">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-sm-3">
+                  <div>
+                    <div class="box">
+                      <div class="box-header">
+                        <h3 class="box-title">Filter Supplements</h3>
+                      </div>
+                      <div class="box-body">
+                        <div class="form-group shiny-input-container shiny-input-container-inline" style="display: inline-block; width: 100%;">
+                          <input id="searchType" type="checkbox" class="sw-switchInput" data-input-id="searchType" data-on-text="OR" data-off-text="AND" data-label-text="Type of search" data-off-color="info" data-label-width="auto" data-handle-width="auto" data-size="mini"/>
+                        </div>
+                        <div class="form-group shiny-input-container">
+                          <label for="searchTerm">Terms to include in supplement name</label>
+                          <div id="searchTerm" data-reset="TRUE" data-reset-value="" class="input-group search-text">
+                            <input id="searchTerm_text" style="border-radius: 0.25em 0 0 0.25em !important;" type="text" class="form-control" value="" placeholder="Eg: calcium,antacid"/>
+                            <div class="input-group-btn"></div>
+                          </div>
+                        </div>
+                        <div class="form-group shiny-input-container">
+                          <label for="removeTerm">Terms to remove</label>
+                          <div id="removeTerm" data-reset="TRUE" data-reset-value="" class="input-group search-text">
+                            <input id="removeTerm_text" style="border-radius: 0.25em 0 0 0.25em !important;" type="text" class="form-control" value placeholder="Eg: Antacid,Gummy"/>
+                            <div class="input-group-btn"></div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="box-footer">You can filter Supplement Names as well as the year</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div>
+                    <div class="box">
+                      <div class="box-header">
+                        <h3 class="box-title">Select survey cycles</h3>
+                      </div>
+                      <div class="box-body">
+                        <div class="form-group shiny-input-container">
+                          <label class="control-label" for="year">Year</label>
+                          <input class="js-range-slider sw-slider-text" data-data-type="text" data-drag-interval="true" data-force-edges="true" data-from="3" data-from-fixed="false" data-from-shadow="false" data-grid="true" data-hide-min-max="false" data-keyboard="true" data-prettify-enabled="false" data-swvalues="[&quot;2007-2008&quot;,&quot;2009-2010&quot;,&quot;2011-2012&quot;,&quot;2013-2014&quot;,&quot;2015-2016&quot;,&quot;2017-2018&quot;]" data-to="4" data-to-fixed="false" data-to-shadow="false" data-type="double" id="year"/>
+                        </div>
+                      </div>
+                      <div class="box-footer">weights are combined if multiple survey cycles are selected</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="shiny-html-output col-sm-" id="uniqSuppl"></div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="shiny-html-output col-sm-" id="uniqBrand"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="shiny-html-output col-sm-" id="first24Sum"></div>
+                  </div>
+                  <div class="row">
+                    <div class="shiny-html-output col-sm-" id="second24Sum"></div>
+                  </div>
+                </div>
+              </div>
+              <div id="searchedSupplement" style="width:100%; height:auto; " class="datatables html-widget html-widget-output"></div>
+              <a id="downloadSupplement" class="btn btn-default shiny-download-link " href="" target="_blank" download>
+                <i class="fa fa-download"></i>
+                Download supplement info
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
