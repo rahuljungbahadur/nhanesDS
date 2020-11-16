@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup}
+library(tidyverse)
+library(magrittr)
+library(haven)
+
+```
+
+```{r}
+nhanes17_18demo <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT")
+nhanes18_18_30DayInterview <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DSQIDS_J.XPT")
+```
+
+```{r}
+nhanes17_18demo %>% colnames()
+nhanes18_18_30DayInterview %>% colnames()
+```
+
+All survey respondents were eligible for 30 day dietary supplements interview. Hence, the total number of people who reported taking any supplements at all during the survey cycle 2017-2018 were as follows:
+
+
+```{r}
+nhanes17_18Supplements <- nhanes18_18_30DayInterview %>% 
+  select(SEQN, DSDPID, DSDSUPP) %>%
+  left_join(nhanes17_18demo %>% 
+              select(SEQN, WTINT2YR),
+            by = "SEQN")
+```
+
+```{r}
+nhanes17_18Supplements %>% View()
+```
+
+Check to see how many SEQn are NA or missing
+
+```{r}
+sum(is.na(nhanes17_18Supplements$SEQN))
+```
+## None are missing
+
+Sum of all weights - This indicates the number of products bought. Single person can have multiple supplements.
+```{r}
+sum(nhanes17_18Supplements$WTINT2YR) %>%
+  format(big.mark   = "",   big.interval = 3L)
+```
+Supplements having calcium in their Names (DSDSUPP)
+```{r}
+nhanes17_18Supplements %>% 
+  filter(str_detect(DSDSUPP, regex(pattern = "calcium", ignore_case = T)),
+         !str_detect(DSDSUPP, regex(pattern = "antacid", ignore_case = T))) %>%
+  group_by() %>%
+  summarise(wt_sum = sum(WTINT2YR))
+```
+sums up to be 29,020,781. Redoing this to be sure
+
+```{r}
+sum(nhanes17_18Supplements$WTINT2YR[grepl(nhanes17_18Supplements$DSDSUPP,
+                                          pattern = "calcium",
+                                          ignore.case = T) &
+                                      !grepl(nhanes17_18Supplements$DSDSUPP,
+                                          pattern = "antacid",
+                                          ignore.case = T)])
+```
+This matches with what the program outputs.
+
+Getting the total number of supplements
+
+
+
+```{r}
+nhanes17_18Supplements %>%
+  filter(str_detect(DSDSUPP, regex(pattern = "calcium", ignore_case = T)),
+         !str_detect(DSDSUPP, regex(pattern = "antacid", ignore_case = T))) %>%
+  summarise(totalSuppl = n_distinct(DSDPID),
+            totalWeights = sum(WTINT2YR))
+  
+```
+
+
+
+
+
+
